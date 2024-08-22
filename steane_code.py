@@ -1,11 +1,12 @@
-# Import necessary libraries from Qiskit and other modules.
-from qiskit import *  # Import all core components from Qiskit.
-from qiskit import transpile  # Import the transpile function, which optimizes quantum circuits.
-from qiskit.visualization import plot_histogram  # Import function to plot histograms of measurement outcomes.
-from qiskit_aer import AerSimulator  # Import the AerSimulator, which simulates quantum circuits.
-from qiskit.visualization import plot_bloch_multivector, plot_histogram  # Import visualization tools.
-from qiskit import execute  # Import execute function to run quantum circuits.
-import math  # Import math module for mathematical functions.
+# !pip install qiskit
+# !pip install qiskit-aer
+# !pip install pylatexenc
+
+from qiskit import QuantumCircuit
+from qiskit.visualization import plot_histogram
+from qiskit_aer import AerSimulator
+from qiskit.visualization import plot_bloch_multivector
+import math
 
 # Helper function to create the Steane code circuit
 def create_steane_code():
@@ -23,7 +24,7 @@ def create_steane_code():
     qc.cx(1, 4)  # Apply CNOT gate with control qubit 1 and target qubit 4.
     qc.cx(2, 6)  # Apply CNOT gate with control qubit 2 and target qubit 6.
     qc.cx(4, 6)  # Apply CNOT gate with control qubit 4 and target qubit 6.
-    
+
     return qc  # Return the quantum circuit encoding the logical |0> state.
 
 # Create the Steane code quantum circuit
@@ -62,12 +63,19 @@ def correct_errors(qc, syndrome):
 
 # Example usage:
 simulator = AerSimulator()  # Instantiate the AerSimulator
-result = execute(syndrome_qc, backend=simulator, shots=1).result()
-# Execute the syndrome measurement circuit on the AerSimulator with one shot.
-syndrome = list(result.get_counts().keys())[0]  # Get the measured syndrome from the result.
-correct_errors(steane_qc, syndrome)  # Correct the errors in the Steane code circuit based on the syndrome.
 
-steane_qc.draw('mpl')  # Visualize the final circuit with error correction applied.
+# Run the syndrome measurement circuit on the simulator
+result = simulator.run(syndrome_qc, shots=1, memory=True).result()
+syndrome = list(result.get_memory())[0]  # Get the measured syndrome from the result.
+
+# Correct the errors in the Steane code circuit based on the syndrome
+correct_errors(steane_qc, syndrome)
+
+# Visualize the final circuit with error correction applied
+steane_qc.draw('mpl')
+
+
+
 
 
 
